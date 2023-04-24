@@ -31,3 +31,11 @@
       padding: 0; /* Remove padding */
       margin: 0; /* Remove margins */
     }
+
+    .hidden{
+      display: none;
+    }
+
+    li:hover .hidden{
+      display:block;
+    }

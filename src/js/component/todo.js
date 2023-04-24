@@ -11,27 +11,27 @@ export default function Todo() {
     "do something again",
   ]);
 
-    // API call 1. save the todo list items in console 2 use console log to access the text array.labal.... 3 make it show up on to do list replace do something etc
+  // API call 1. save the todo list items in console 2 use console log to access the text array.label.... 3 make it show up on to do list replace do something etc
   let PostUrl = 'https://assets.breatheco.de/apis/fake/todos/user/mikiemapo';
-  const GetTodoItem = () => {
+  useEffect (()=> {
     fetch(PostUrl)
-    .then(
-      (recived)=>{
-        return recived.json()
-      }
-    )
-    .then(
-      (represent)=>{
-        console.log(represent,"ÏAMHER")
-
-      }
-    )
-    .catch((Ierror)=> console.error(Ierror))
-  }
-
-  useEffect(()=>{
-GetTodoItem();
+      .then(
+        (recived) => {
+          return recived.json()
+        }
+      )
+      .then(
+        (represent) => {
+          console.log(represent, "ÏAMHER")
+        setNewTodo(represent)
+        }
+      )
+      .catch((error) => console.error(error))
   },[])
+
+  // useEffect(() => {
+  //   GetTodoItem();
+  // }, [])
 
 
   // remove task from the list
@@ -42,7 +42,7 @@ GetTodoItem();
     setNewTodo(remItem);
   }
 
-  
+
   // map is used to output the template in our case its the do something array
   let todoI = newTodo.map((item, index) => {
     return (
@@ -50,8 +50,9 @@ GetTodoItem();
       <li
         onMouseEnter={() => setDisplayx(false)}
         onMouseLeave={() => setDisplayx(true)}
-        className="todoItem"
+        className="todoItem d-flex mx-3"
         key={index}
+        
       >
         {item}
         <div
@@ -61,7 +62,8 @@ GetTodoItem();
             removeTask(index);
           }}
         >
-          X
+          <span className="hidden">X</span>
+         
         </div>
       </li>
     );
