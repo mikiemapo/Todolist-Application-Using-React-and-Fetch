@@ -2,38 +2,57 @@ import React, { useEffect, useState } from "react";
 
 export default function Todo() {
 
-  // list is stored in use state
-  const [task, setTask] = useState("");
-  const [displayx, setDisplayx] = useState(true);
+  // 3 stored in use state
+  const [task, setTask] = useState(""); // value of the input 
+  const [displayx, setDisplayx] = useState(true); //boolean variable 'X' icon should be displayed or hidden for each task in the list.
+  //array of objects representing the list
   const [newTodo, setNewTodo] = useState([
     "do something",
     "do something else",
     "do something again",
   ]);
 
-  // API call 1. save the todo list items in console 2 use console log to access the text array.label.... 3 make it show up on to do list replace do something etc
+  // useEffect hook to make an API call to fetch the initial list of tasks
   let PostUrl = 'https://assets.breatheco.de/apis/fake/todos/user/mikiemapo';
   useEffect(() => {
     getTodo();
   }, [])
 
-  // useEffect(() => {
-  //   GetTodoItem();
-  // }, [])
 
 
-  // remove task from the list
+  //  takes an index parameter and filters out the task at that index from the `newTodo` array and back end.
   function removeTask(i) {
     let remItem = newTodo.filter((repItem, repIndex) => {
       return repIndex != i;
     });
-    setNewTodo(remItem);
-  }
-
-
-  // map is used to output the template in our case its the do something array
   
-  // add task to the list and . . . is a spread opp spread opp is used to allow itarables to be spread individually.
+    fetch(`https://assets.breatheco.de/apis/fake/todos/user/mikiemapo`, {
+      method: "PUT",
+      body: JSON.stringify(remItem),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(resp => {
+      console.log(resp.ok);
+      console.log(resp.status);
+      console.log(resp.text());
+    })
+
+    .then(data => {
+      getTodo()
+    })
+
+    .catch(error => {
+      console.log(error);
+    });
+  }
+  
+
+
+
+
+  //`getTodo` updates the state variable `newTodo` with the new list of tasks abd calls `setNewtodo`.
   const getTodo = () => {
     fetch(PostUrl)
       .then(
@@ -52,9 +71,10 @@ export default function Todo() {
   }
 
 
+  //event parameter listens and creates new array of tasks by spreading the existing `newTodo` array and adding the new task. It makes a PUT request updates the list, calls `getTodo` to update the state variable `newTodo`.
   const addTodo = (e) => {
     if (e.key === "Enter") {
-      const newTask = [...newTodo, {label:task,done:false}];
+      const newTask = [...newTodo, { label: task, done: false }];
       console.log(newTask)
       fetch('https://assets.breatheco.de/apis/fake/todos/user/mikiemapo', {
         method: "PUT",
@@ -71,7 +91,7 @@ export default function Todo() {
         })
         .then(data => {
           getTodo()
-      })
+        })
 
         .catch(error => {
           //error handling
@@ -80,6 +100,7 @@ export default function Todo() {
     }
   };
 
+  // renders a form input element
   return (
     <div className="spawn">
       <h1>To Do List</h1>
@@ -90,33 +111,43 @@ export default function Todo() {
           value={task}
           onChange={(event) => setTask(event.target.value)}
           type="text"
-          onKeyDown={(e)=> addTodo(e)}
+          onKeyDown={(e) => addTodo(e)}
         />
       </div>
+      {/* {newTodo.map((item, index) => {
+        return (
+          <div key={index}>
+              todo item:{item.label}
+          </div>
+        )
+      })} */}
+
+      
       <ul className="RemoveBullet">{newTodo.map((item, index) => {
-    return (
-      // on mouse enter is the same as hover key property keeps track of each unique item is allways preceeded by map
-      <li
-        onMouseEnter={() => setDisplayx(false)}
-        onMouseLeave={() => setDisplayx(true)}
-        className="todoItem d-flex mx-3"
-        key={index}
+        //"item" and "index". "item" represents the current element being processed in the array, and "index" represents the index of that element in the array.
+        return (
+          // event listener that sets the state of the variable "displayx" to either true or false depending on the mouse event that occurs.
+          <li
+            onMouseEnter={() => setDisplayx(false)}
+            onMouseLeave={() => setDisplayx(true)}
+            className="todoItem d-flex mx-3"
+            key={index}
 
-      >
-        {item.label}
-        <div
-          className={displayx ? "d-none" : "remove"}
-          // remove task index reffering the function up top
-          onClick={() => {
-            removeTask(index);
-          }}
-        >
-          <span className="hidden">X</span>
+          >
+            {item.label}
+            <div
+              className={displayx ? "d-none" : "remove"}
+              // remove task index reffering the function up top
+              onClick={() => {
+                removeTask(index);
+              }}
+            >
+              <span className="hidden">X</span>
 
-        </div>
-      </li>
-    );
-  })}</ul>
+            </div>
+          </li>
+        );
+      })}</ul>
       <div>{newTodo.length} task left</div>
     </div>
   );
